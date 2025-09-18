@@ -1,0 +1,1 @@
+Map<Filter<Map<std::slice::Iter<'_, &str>, {closure@exercises/iterators/iterators2.rs:35:22: 35:28}>, {closure@exercises/iterators/iterators2.rs:35:49: 35:55}>, {closure@exercises/iterators/iterators2.rs:35:78: 35:84}>
