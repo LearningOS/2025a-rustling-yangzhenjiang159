@@ -2,7 +2,7 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
+
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -37,7 +37,35 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        // 增加元素计数
+        self.count += 1;
+        
+        // 如果需要扩展数组
+        if self.count >= self.items.len() {
+            self.items.push(T::default());
+        }
+        
+        // 将新元素放在数组末尾
+        self.items[self.count] = value;
+        
+        // 上浮操作，维护堆性质
+        self.heapify_up(self.count);
+    }
+    
+    // 上浮操作：将指定位置的元素向上移动直到满足堆性质
+    fn heapify_up(&mut self, mut idx: usize) {
+        while idx > 1 {
+            let parent_idx = self.parent_idx(idx);
+            
+            // 如果当前元素满足堆性质，停止上浮
+            if !(self.comparator)(&self.items[idx], &self.items[parent_idx]) {
+                break;
+            }
+            
+            // 交换当前元素和父元素
+            self.items.swap(idx, parent_idx);
+            idx = parent_idx;
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,8 +85,41 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        let left_idx = self.left_child_idx(idx);
+        let right_idx = self.right_child_idx(idx);
+        
+        // 如果没有子节点，返回当前索引
+        if left_idx > self.count {
+            return idx;
+        }
+        
+        // 如果只有左子节点
+        if right_idx > self.count {
+            return left_idx;
+        }
+        
+        // 比较左右子节点，返回满足堆性质的那个
+        if (self.comparator)(&self.items[left_idx], &self.items[right_idx]) {
+            left_idx
+        } else {
+            right_idx
+        }
+    }
+    
+    // 下沉操作：将指定位置的元素向下移动直到满足堆性质
+    fn heapify_down(&mut self, mut idx: usize) {
+        while self.children_present(idx) {
+            let target_idx = self.smallest_child_idx(idx);
+            
+            // 如果当前元素已经满足堆性质，停止下沉
+            if target_idx == idx || !(self.comparator)(&self.items[target_idx], &self.items[idx]) {
+                break;
+            }
+            
+            // 交换当前元素和目标子元素
+            self.items.swap(idx, target_idx);
+            idx = target_idx;
+        }
     }
 }
 
@@ -84,8 +145,28 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        // 如果堆为空，返回None
+        if self.count == 0 {
+            return None;
+        }
+        
+        // 保存堆顶元素（要返回的值）
+        let result = std::mem::replace(&mut self.items[1], T::default());
+        
+        // 将最后一个元素移到堆顶
+        if self.count > 1 {
+            self.items[1] = std::mem::replace(&mut self.items[self.count], T::default());
+        }
+        
+        // 减少元素计数
+        self.count -= 1;
+        
+        // 如果还有元素，执行下沉操作维护堆性质
+        if self.count > 0 {
+            self.heapify_down(1);
+        }
+        
+        Some(result)
     }
 }
 
